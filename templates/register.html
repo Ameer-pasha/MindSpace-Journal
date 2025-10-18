@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title if title else "Register" }}</title>
-    <!-- Assuming styles.css contains base styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
-        /* Custom styles for the success animation (identical to login) */
+        /* Custom styles for the success animation (duplicated for self-containment) */
         .success-overlay {
             position: fixed;
             top: 0;
@@ -60,9 +59,13 @@
             display: flex;
         }
 
+        .login-container.hide-form {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
         /* Style for the Google setup alert */
         .google-setup-alert {
-            display: none;
             background-color: #fca5a5; /* Red 400 */
             color: #7f1d1d; /* Red 900 */
             padding: 10px;
@@ -71,6 +74,17 @@
             font-size: 0.85rem;
             text-align: left;
         }
+
+        /* Flash message styling for clarity */
+        .alert-success {
+            background-color: #d1fae5; /* Green 100 */
+            color: #065f46; /* Green 800 */
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        /* Add other alerts styles as needed */
+
     </style>
 </head>
 <body class="login-body">
@@ -85,7 +99,7 @@
         <div class="login-card card">
             <h2>{{ title if title else "Sign Up" }}</h2>
 
-            <!-- FLASH MESSAGES -->
+            <!-- FLASH MESSAGES: This block renders the 'alert-success' message -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -94,13 +108,11 @@
                 {% endif %}
             {% endwith %}
 
-            <!-- GOOGLE SETUP ERROR MESSAGE -->
-            <div id="google-setup-error" class="google-setup-alert">
+            <div id="google-setup-error" class="google-setup-alert" style="display: none;">
                 <p>⚠️ **Google Registration is not configured.**</p>
-                <p>Please ensure the `google_login_url` variable is passed correctly by the Flask backend.</p>
+                <p>Please ensure `client_secret.json` is available and environment variables are set correctly.</p>
             </div>
 
-            <!-- Google registration button -->
             <a id="google-login-link" href="{{ google_login_url }}" class="google-login-button">
                 <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -115,29 +127,28 @@
                 <span class="divider-text">or</span>
             </div>
 
-            <!-- Registration form -->
             <form action="{{ url_for('register') }}" method="POST" class="login-form">
-            {{ form.hidden_tag() }}
+                {{ form.hidden_tag() }}
 
-            <div class="input-group">
-                {{ form.username.label }}
-                {{ form.username(class="form-control", placeholder="Enter your username") }}
-            </div>
+                <div class="input-group">
+                    {{ form.username.label }}
+                    {{ form.username(class="form-control", placeholder="Enter your username") }}
+                </div>
 
-            <div class="input-group">
-                {{ form.email.label }}
-                {{ form.email(class="form-control", placeholder="you@example.com") }}
-            </div>
+                <div class="input-group">
+                    {{ form.email.label }}
+                    {{ form.email(class="form-control", placeholder="you@example.com") }}
+                </div>
 
-            <div class="input-group">
-                {{ form.password.label }}
-                {{ form.password(class="form-control", placeholder="Enter your password (min 6 characters)") }}
-            </div>
+                <div class="input-group">
+                    {{ form.password.label }}
+                    {{ form.password(class="form-control", placeholder="Enter your password (min 6 characters)") }}
+                </div>
 
-            <button type="submit" class="login-button submit-button">
-                Create Account
-            </button>
-        </form>
+                <button type="submit" class="login-button submit-button">
+                    Create Account
+                </button>
+            </form>
 
             <p class="signup-link">
                 Already have an account? <a href="{{ url_for('login') }}">Login here</a>
@@ -146,49 +157,46 @@
 
     </div>
 
-    <!-- SUCCESS ANIMATION OVERLAY -->
+    <!-- SUCCESS ANIMATION OVERLAY (Added) -->
     <div id="success-overlay" class="success-overlay">
         <div class="checkmark-circle">
             <div class="checkmark"></div>
         </div>
-        Account Created!
+        Welcome Aboard!
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const googleLink = document.getElementById('google-login-link');
             const googleError = document.getElementById('google-setup-error');
-            const successAlert = document.querySelector('.alert.alert-success');
-            const successOverlay = document.getElementById('success-overlay');
 
             // --- CHECK GOOGLE URL STATUS ---
-            // If the href is empty (meaning Flask didn't pass the URL)
             if (googleLink.getAttribute('href') === 'None' || googleLink.getAttribute('href') === '') {
                 googleError.style.display = 'block';
                 googleLink.addEventListener('click', (e) => {
-                    e.preventDefault(); // Prevent default action if the link is bad
+                    e.preventDefault();
                 });
-                console.error("Google login URL is missing. Check Flask context variables.");
             } else {
                 googleError.style.display = 'none';
             }
 
+            // --- SUCCESS ANIMATION LOGIC (Added) ---
+            const successAlert = document.querySelector('.alert.alert-success');
+            const successOverlay = document.getElementById('success-overlay');
+            const loginContainer = document.querySelector('.login-container'); // This container holds the form
 
-            // --- CHECK SUCCESS ANIMATION STATUS ---
-            // If a success alert exists, trigger the animation and redirect
             if (successAlert) {
-                console.log("SUCCESS ALERT DETECTED. Triggering animation.");
+                // Hide the main form container instantly for a cleaner transition
+                loginContainer.classList.add('hide-form');
 
                 // Show the animation overlay
                 successOverlay.classList.add('show');
 
-                // Wait for animation to finish (approx 3 seconds total)
+                // Wait for animation to finish (3 seconds total)
                 setTimeout(() => {
-                    // Attempt to redirect to the home page (where logged-in users go)
+                    // Perform the final client-side redirect to the home page
                     window.location.href = "{{ url_for('home') }}";
                 }, 3000);
-            } else {
-                console.log("No success alert detected. Displaying standard registration form.");
             }
         });
     </script>
