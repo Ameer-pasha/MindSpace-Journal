@@ -3,16 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirm Logout</title>
+    <title>Confirm Logout - Life Journal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .logout-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .logout-buttons button,
+        .logout-buttons a {
+            flex: 1;
+            max-width: 150px;
+            text-align: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+
+        .btn-logout {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-cancel {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background-color: #4b5563;
+        }
+    </style>
 </head>
 <body class="login-body">
     <div class="login-container">
-        <div class="login-card card text-center">
-            <h2>Are you sure you want to logout?</h2>
-            <form method="POST">
-                <button type="submit" class="login-button submit-button">Yes, Logout</button>
-                <a href="{{ url_for('home') }}" class="login-button submit-button" style="background-color: gray;">Cancel</a>
+        <div class="login-card card">
+            <h2 style="text-align: center; margin-bottom: 1rem;">Confirm Logout</h2>
+            <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">
+                Are you sure you want to log out of your account?
+            </p>
+            
+            <form method="POST" style="margin: 0;">
+                <div class="logout-buttons">
+                    <button type="submit" class="btn-logout">Yes, Logout</button>
+                    <a href="{{ url_for('home') }}" class="btn-cancel">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
