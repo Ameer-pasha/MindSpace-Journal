@@ -59,18 +59,6 @@
             opacity: 1;
             display: flex;
         }
-
-        /* Style for the Google setup alert */
-        .google-setup-alert {
-            display: none;
-            background-color: #fca5a5; /* Red 400 */
-            color: #7f1d1d; /* Red 900 */
-            padding: 10px;
-            margin-top: 15px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            text-align: left;
-        }
     </style>
 </head>
 <body class="login-body">
@@ -94,14 +82,9 @@
                 {% endif %}
             {% endwith %}
 
-            <!-- GOOGLE SETUP ERROR MESSAGE -->
-            <div id="google-setup-error" class="google-setup-alert">
-                <p>⚠️ **Google Registration is not configured.**</p>
-                <p>Please ensure the `google_login_url` variable is passed correctly by the Flask backend.</p>
-            </div>
-
-            <!-- Google registration button -->
-            <a id="google-login-link" href="{{ google_login_url }}" class="google-login-button">
+            <!-- Google registration button (only show if configured) -->
+            {% if google_login_url %}
+            <a href="{{ google_login_url }}" class="google-login-button">
                 <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -114,6 +97,7 @@
             <div class="divider">
                 <span class="divider-text">or</span>
             </div>
+            {% endif %}
 
             <!-- Registration form -->
             <form action="{{ url_for('register') }}" method="POST" class="login-form">
@@ -156,23 +140,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const googleLink = document.getElementById('google-login-link');
-            const googleError = document.getElementById('google-setup-error');
             const successAlert = document.querySelector('.alert.alert-success');
             const successOverlay = document.getElementById('success-overlay');
-
-            // --- CHECK GOOGLE URL STATUS ---
-            // If the href is empty (meaning Flask didn't pass the URL)
-            if (googleLink.getAttribute('href') === 'None' || googleLink.getAttribute('href') === '') {
-                googleError.style.display = 'block';
-                googleLink.addEventListener('click', (e) => {
-                    e.preventDefault(); // Prevent default action if the link is bad
-                });
-                console.error("Google login URL is missing. Check Flask context variables.");
-            } else {
-                googleError.style.display = 'none';
-            }
-
 
             // --- CHECK SUCCESS ANIMATION STATUS ---
             // If a success alert exists, trigger the animation and redirect
