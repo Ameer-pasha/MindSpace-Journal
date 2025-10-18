@@ -8,7 +8,7 @@ from datetime import datetime, date, timedelta
 from functools import wraps
 
 # Third-party imports
-import joblib
+
 import requests
 import requests as http_requests
 from dotenv import load_dotenv
@@ -47,10 +47,6 @@ class Base(DeclarativeBase):
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
-
-# Load ML models
-classifier = joblib.load("models/tweet_sentiment_model.pkl")
-vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
 
 # Sentiment mapping
 sentiment_map = {0: "Neutral 🤔", 1: "Positive 😊", -1: "Negative 💛"}
