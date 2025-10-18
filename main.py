@@ -86,8 +86,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
-    password = db.Column(db.String(150), nullable=True)
-
+    password = db.Column(db.String(255), nullable=True)
+    
     # Relationships
     entries = db.relationship('JournalEntry', back_populates='user', cascade='all, delete-orphan')
     goals = db.relationship('Goal', back_populates='user', cascade='all, delete-orphan')
@@ -662,6 +662,9 @@ def clear_chat():
 # Initialize database tables on startup
 with app.app_context():
     db.create_all()
-
+    
 if __name__ == "__main__":
+    with app.app_context():
+        db.drop_all()  # Add this line
+        db.create_all()
     app.run(debug=os.environ.get('FLASK_DEBUG', '0') == '1')
