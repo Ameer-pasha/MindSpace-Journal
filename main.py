@@ -1,72 +1,58 @@
-import google.oauth2.id_token
-import google.auth.transport.requests
 import os
-from flask import Flask, render_template, request, flash, redirect, url_for, session
-from flask_wtf import FlaskForm
-
-import google.oauth2.id_token
-import google.auth.transport.requests
-import os
-
-from google_auth_oauthlib.flow import Flow
-from flask import Flask, render_template, request, flash, redirect, url_for, session
-from werkzeug.security import check_password_hash, generate_password_hash
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Email, Length
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-from google_auth_oauthlib.flow import Flow
-import requests as http_requests
+import json
 import uuid
+import time
+import requests
+
+from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
+from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.orm import DeclarativeBase, relationship
 from datetime import datetime
+from functools import wraps
+import requests as http_requests
 
-from datetime import datetime
+# Google OAuth
+import google.oauth2.id_token
+import google.auth.transport.requests
+from google_auth_oauthlib.flow import Flow
 
-import uuid
+# Load environment variables from .env if needed
 from dotenv import load_dotenv
-import os
-import requests
-import json
-import time
-import os
-from flask import render_template, request, jsonify, session, redirect, url_for
-from functools import wraps  # IMPORTED for the fix!
-
 load_dotenv()
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-
 class Base(DeclarativeBase):
     pass
 
-
+# --- Initialize Flask app once ---
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
+app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
+# --- Database setup ---
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///mydatabase.db")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-
-# Sentiment mapping
+# --- Sentiment mapping ---
 sentiment_map = {0: "Neutral 🤔", 1: "Positive 😊", -1: "Negative 💛"}
 
-# API configuration
+# --- Gemini API setup ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent"
 SYSTEM_PROMPT = "You are a warm, empathetic, and supportive AI companion for a personal journal app. Your goal is to engage in thoughtful and helpful conversation, acknowledging the user's feelings and encouraging them to share more."
 
-# Google OAuth configuration
+# --- Google OAuth setup ---
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 REDIRECT_URI = os.environ.get('REDIRECT_URI', 'http://127.0.0.1:5000/callback')
-
-
 client_secret_json = os.environ.get("GOOGLE_CLIENT_SECRET_JSON")
 
-if client_secret_json:
-    # Write to temporary file
+if client_secret_json and REDIRECT_URI:
+    # Save env JSON to temporary file
     with open("temp_client_secret.json", "w") as f:
         f.write(client_secret_json)
 
@@ -77,17 +63,10 @@ if client_secret_json:
             "https://www.googleapis.com/auth/userinfo.profile",
             "openid"
         ],
-        redirect_uri=os.environ.get("REDIRECT_URI")
+        redirect_uri=REDIRECT_URI
     )
 else:
     flow = None
-
-
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mydatabase.db"
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL", "sqlite:///mydatabase.db")
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
 
 
 # --- User Model ---
