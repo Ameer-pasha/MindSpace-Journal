@@ -1,0 +1,1643 @@
+/* ===== General Page Setup ===== */
+body {
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Card Container ===== */
+.card {
+  border: none;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===== Headings ===== */
+h2 {
+  font-weight: 600;
+  color: #2e7d32;
+  text-align: center;
+}
+
+/* ===== Input Fields ===== */
+.form-control {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+  background: #4CAF50;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  padding: 10px;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+  transform: scale(1.03);
+}
+
+/* ===== Links ===== */
+a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Alert Messages ===== */
+.alert {
+  border-radius: 10px;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 480px) {
+  .card {
+    width: 100% !important;
+    margin: 0 10px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .btn-primary {
+    font-size: 0.95rem;
+  }
+}/* Import Google Fonts - Using 'Inter' as a modern, clean font like in the UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Basic CSS Reset & Global Styles */
+* {
+    /* Set the box-sizing to 'border-box' for easier layout management */
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Apply the font */
+    background-color: #f6f7f8; /* Light gray background for the overall app */
+    display: flex; /* We'll use Flexbox to lay out the sidebar and main content */
+    min-height: 100vh; /* Make the body at least the height of the viewport */
+    color: #333;
+}
+
+/* -------------------- LAYOUT -------------------- */
+
+.main-content {
+    flex-grow: 1; /* Allows the content to take up the remaining space */
+    padding: 30px; /* Spacing around the content */
+    margin-left: 250px; /* Adjust this to match the sidebar width */
+    max-width: calc(100% - 250px); /* Ensures content doesn't overflow */
+}
+
+/* -------------------- CARD STYLING -------------------- */
+/* This will be used for the large white containers on each page */
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Soft shadow */
+    margin-bottom: 25px; /* Spacing between cards/sections */
+}
+
+/* -------------------- HEADINGS -------------------- */
+
+h1, h2 {
+    color: #1a1a1a;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 2em; /* Larger title for the page */
+}
+
+/* Utility to center simple elements (used for the initial setup) */
+.center-text {
+    text-align: center;
+}
+
+/* Custom Colors for reference */
+:root {
+    --primary-green: #38b69e; /* The main accent color */
+    --light-green: #e9f5f1; /* Background for active/hover state */
+    --text-dark: #333;
+    --text-light: #5a5a5a;
+    --sidebar-width: 250px;
+}
+
+/* -------------------- SIDEBAR STYLING -------------------- */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff; /* White background */
+    position: fixed; /* Keep it in place when scrolling */
+    top: 0;
+    left: 0;
+    height: 100vh; /* Full height of the screen */
+    padding: 20px 0;
+    display: flex; /* Use flexbox to position the header, links, and sign-out */
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Subtle shadow on the edge */
+}
+
+.sidebar-header {
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.app-logo {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--primary-green);
+    /* In the screenshot, there is a small icon next to the text logo */
+    /* We'll add a simple placeholder for now */
+}
+
+/* Navigation Links List */
+.nav-links {
+    list-style: none; /* Remove bullet points */
+    flex-grow: 1; /* Pushes the sign-out to the bottom */
+}
+
+.nav-links li {
+    margin-bottom: 5px;
+}
+
+/* Individual Navigation Item (the anchor tag) */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    text-decoration: none; /* Remove underline */
+    color: var(--text-light); /* Default text color for links */
+    font-weight: 600;
+    border-radius: 0 50px 50px 0; /* Creates the rounded look on the right */
+    transition: background-color 0.2s, color 0.2s;
+    margin-right: 10px; /* Space to see the rounded edge */
+}
+
+/* Icon next to the text */
+.nav-item .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    line-height: 1; /* Helps align the icon vertically */
+}
+
+/* Hover State */
+.nav-item:hover {
+    background-color: var(--light-green);
+    color: var(--primary-green);
+}
+
+/* Active State (The currently selected page) */
+.nav-item.active {
+    background-color: var(--light-green);
+    color: var(--primary-green);
+    /* Adding a vertical bar on the left side of the active item for emphasis */
+    border-left: 4px solid var(--primary-green);
+    padding-left: 16px; /* Adjusting padding because of the new border */
+}
+
+/* Sign Out Section Styling */
+.sign-out-section {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    margin-top: auto; /* Ensures it sticks to the bottom */
+}
+
+.sign-out {
+    color: #f44336; /* Using a distinct color for sign-out/danger actions */
+    font-weight: 600;
+}
+
+.sign-out:hover {
+    background-color: #ffeaea;
+    color: #d32f2f;
+}
+
+/* -------------------- JOURNAL PAGE STYLING -------------------- */
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.subtitle {
+    color: var(--text-light);
+    font-size: 1.1em;
+}
+
+/* Styling for the card titles that have a green icon */
+.card-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.sparkle-icon {
+    color: var(--primary-green);
+    font-size: 1.4em;
+    margin-right: 10px;
+    line-height: 1; /* Aligns the icon nicely */
+}
+
+/* Text Area Styling */
+.entry-textarea {
+    width: 100%;
+    min-height: 250px; /* Make it large like in the screenshot */
+    padding: 20px;
+    font-size: 1em;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical; /* Allow resizing only vertically */
+    transition: border-color 0.2s;
+    outline: none; /* Remove default focus outline */
+    color: #333;
+}
+
+.entry-textarea:focus {
+    border-color: var(--primary-green); /* Subtle feedback when focused */
+}
+
+/* Submit Button Styling (The large green button) */
+.submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Make it span the full width of the card */
+    padding: 15px 25px;
+    margin-top: 20px;
+    background-color: var(--primary-green);
+    color: #ffffff;
+    font-size: 1.1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.submit-button .icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.submit-button:hover {
+    background-color: #31a48c; /* Slightly darker green on hover */
+    box-shadow: 0 2px 8px rgba(56, 182, 158, 0.4); /* Green shadow */
+}
+
+/* Recent Entries Section */
+.recent-entries-section h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* Additional utility for the Recent Entries card placeholder */
+.recent-entries-section .card {
+    border: 1px dashed #ccc; /* Dashed border for the placeholder look */
+    color: #777;
+}
+
+/* -------------------- AI CHAT PAGE STYLING -------------------- */
+
+.ai-chat-card {
+    /* Give the chat card a fixed height and enable scrolling if content overflows */
+    min-height: 600px; 
+    display: flex; /* Use flex to manage the chat log and potential input area */
+    flex-direction: column;
+}
+
+.chat-log {
+    flex-grow: 1; /* Allows the chat log to take up most of the space */
+    padding-right: 10px; /* Space for the scrollbar if needed */
+    /* If you had a lot of messages, you'd use overflow-y: auto here */
+    /* For now, we'll focus on styling the bubbles */
+}
+
+/* Base style for all chat messages */
+.chat-message {
+    max-width: 80%; /* Messages shouldn't take up the full width */
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    line-height: 1.5;
+    word-wrap: break-word; /* Ensures long words wrap correctly */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow on bubbles */
+}
+
+/* User Message Styling (Green Bubble) */
+.user-message {
+    /* Aligned to the right */
+    margin-left: auto; 
+    background-color: var(--primary-green); /* Green background */
+    color: #ffffff; /* White text */
+    /* Rounded corners: more rounded on top-left and bottom-left, less on the right */
+    border-top-right-radius: 5px; 
+    border-bottom-right-radius: 5px;
+}
+
+/* AI Message Styling (Light/White Bubble) */
+.ai-message {
+    /* Aligned to the left (default) */
+    margin-right: auto;
+    background-color: #f7f7f7; /* Very light gray/off-white background */
+    color: var(--text-dark);
+    /* Rounded corners: more rounded on top-right and bottom-right, less on the left */
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+/* Specific styling for the AI intro line with the icon */
+.ai-intro {
+    font-weight: 600; /* Make the first sentence slightly bolder */
+    margin-bottom: 10px;
+}
+
+/* Ensure the sparkle icon in the AI chat is styled correctly */
+.ai-message .sparkle-icon {
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+
+/* Paragraph spacing inside the AI message */
+.ai-message p {
+    margin-bottom: 10px;
+}
+
+.ai-message p:last-child {
+    margin-bottom: 0;
+}
+
+/* -------------------- GOALS PAGE STYLING -------------------- */
+
+/* --- Goals Progress Card (The top green and white bar) --- */
+.goals-progress-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+}
+
+.progress-details {
+    display: flex;
+    align-items: center;
+}
+
+/* Styling the circular graphic area */
+.progress-circle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 30px;
+    
+    /* Mimicking the circular border and green filling */
+    border: 5px solid var(--primary-green);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+/* Hiding the simple text icon we used in the HTML for the graphic */
+.progress-icon {
+    display: none; 
+}
+
+.progress-count {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.progress-label {
+    color: var(--text-light);
+    font-size: 0.9em;
+}
+
+/* Styling the 100% Progress Rate on the right */
+.progress-rate {
+    text-align: right;
+    color: var(--primary-green);
+}
+
+.rate-value {
+    font-size: 3em; /* Large 100% number */
+    font-weight: 700;
+}
+
+.rate-label {
+    font-size: 1em;
+    font-weight: 600;
+}
+
+/* --- Add New Goal Section --- */
+.add-goal-card {
+    margin-top: 25px;
+}
+
+.add-goal-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.goal-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    font-size: 1em;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.goal-input:focus {
+    border-color: var(--primary-green);
+}
+
+.add-goal-button {
+    background-color: var(--primary-green);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    font-weight: 300;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-goal-button:hover {
+    background-color: #31a48c;
+}
+
+/* --- Your Goals List --- */
+
+.your-goals-list h2 {
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+}
+
+.goal-status-icon {
+    font-size: 1.5em;
+    margin-right: 15px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.goal-status-icon.done {
+    color: var(--primary-green); /* Green color for completed goals */
+    font-weight: 700;
+}
+
+.goal-text {
+    flex-grow: 1;
+    font-size: 1.1em;
+    color: var(--text-dark);
+}
+
+.delete-goal-button {
+    background: none;
+    border: none;
+    color: #f44336; /* Red color for delete icon */
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 5px;
+    transition: opacity 0.2s;
+}
+
+.delete-goal-button:hover {
+    opacity: 0.7;
+}
+
+/* -------------------- INSIGHTS PAGE STYLING -------------------- */
+
+/* --- Metric Cards (The top 4 boxes) --- */
+
+.metric-cards-container {
+    display: flex;
+    gap: 20px; /* Space between the cards */
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    flex: 1; /* Makes all 4 cards take up equal width */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Aligns the icon to the top right */
+    padding: 20px 25px;
+}
+
+.metric-label {
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.metric-icon {
+    font-size: 1.5em;
+    opacity: 0.7; /* Make the icons slightly subdued */
+}
+
+/* Specific color adjustments for some icons to match the screenshot */
+.metric-card:nth-child(2) .metric-icon { color: #8e44ad; } /* Purple for Goals Completed */
+.metric-card:nth-child(3) .metric-icon { color: #e74c3c; } /* Red/Fire for Current Streak */
+.metric-card:nth-child(4) .metric-icon { color: var(--primary-green); } /* Green for Progress Rate */
+
+/* --- Weekly Summary Section --- */
+
+.weekly-summary-section h2 {
+    margin-bottom: 15px;
+}
+
+.summary-label {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+/* Placeholder for the Bar Chart */
+.consistency-chart-placeholder {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end; /* Bars start from the bottom */
+    height: 120px;
+    padding-bottom: 10px; /* Space above the footer text */
+    border-bottom: 1px solid #eee; /* Light line under the bars */
+    margin-bottom: 15px;
+}
+
+.chart-bar {
+    flex: 1; /* Makes all bars equal width */
+    background-color: #f0f0f0; /* Light grey for empty bars */
+    height: 100%; /* Default height for bars (empty look) */
+    border-radius: 4px;
+    min-width: 30px; /* Ensures bars are visible */
+}
+
+/* Simulating the empty look from the screenshot */
+.chart-bar:nth-child(1) { height: 0%; background-color: #e9f5f1; } 
+.chart-bar:nth-child(2) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(3) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(4) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(5) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(6) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(7) { height: 0%; background-color: #e9f5f1; }
+
+.chart-footer {
+    color: var(--text-light);
+    font-size: 0.9em;
+}
+
+/* -------------------- MIND SPACE PAGE STYLING -------------------- */
+
+.wellness-toolkit h2, .recommended-videos h2 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.section-description {
+    color: var(--text-light);
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+/* --- Toolkit Cards Container (Three Columns) --- */
+.toolkit-cards-container {
+    display: flex;
+    gap: 20px; /* Space between the cards */
+    margin-bottom: 40px;
+}
+
+.toolkit-card {
+    flex: 1; /* Makes all cards take up equal space */
+    text-align: center;
+    padding: 30px 20px;
+    display: flex; /* Use Flexbox to stack content vertically */
+    flex-direction: column;
+    align-items: center;
+}
+
+.toolkit-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: var(--primary-green); /* Use the app's accent color */
+}
+
+.toolkit-card h3 {
+    font-weight: 600;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+}
+
+.card-description {
+    color: var(--text-light);
+    font-size: 0.95em;
+    flex-grow: 1; /* Pushes the button to the bottom */
+    margin-bottom: 20px;
+}
+
+/* Styling the Action Buttons inside the cards */
+.toolkit-button {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--light-green); /* Light green/grey background */
+    color: var(--primary-green); /* Green text */
+    border: 1px solid #e0e0e0; 
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.toolkit-button:hover {
+    background-color: #d1e8e2; /* Slightly darker light green on hover */
+    border-color: var(--primary-green);
+}
+
+/* ===== General Page Setup ===== */
+body {
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Card Container ===== */
+.card {
+  border: none;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===== Headings ===== */
+h2 {
+  font-weight: 600;
+  color: #2e7d32;
+  text-align: center;
+}
+
+/* ===== Input Fields ===== */
+.form-control {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #4CAF50;
+  box-shadow: 0 0 6px rgba(76, 175, 80, 0.3);
+}
+
+/* ===== Buttons ===== */
+.btn-primary {
+  background: #4CAF50;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  padding: 10px;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #45a049;
+  transform: scale(1.03);
+}
+
+/* ===== Links ===== */
+a {
+  color: #4CAF50;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Alert Messages ===== */
+.alert {
+  border-radius: 10px;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 480px) {
+  .card {
+    width: 100% !important;
+    margin: 0 10px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .btn-primary {
+    font-size: 0.95rem;
+  }
+}/* Import Google Fonts - Using 'Inter' as a modern, clean font like in the UI */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Basic CSS Reset & Global Styles */
+* {
+    /* Set the box-sizing to 'border-box' for easier layout management */
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif; /* Apply the font */
+    background-color: #f6f7f8; /* Light gray background for the overall app */
+    display: flex; /* We'll use Flexbox to lay out the sidebar and main content */
+    min-height: 100vh; /* Make the body at least the height of the viewport */
+    color: #333;
+}
+
+/* -------------------- LAYOUT -------------------- */
+
+.main-content {
+    flex-grow: 1; /* Allows the content to take up the remaining space */
+    padding: 30px; /* Spacing around the content */
+    margin-left: 250px; /* Adjust this to match the sidebar width */
+    max-width: calc(100% - 250px); /* Ensures content doesn't overflow */
+}
+
+/* -------------------- CARD STYLING -------------------- */
+/* This will be used for the large white containers on each page */
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Soft shadow */
+    margin-bottom: 25px; /* Spacing between cards/sections */
+}
+
+/* -------------------- HEADINGS -------------------- */
+
+h1, h2 {
+    color: #1a1a1a;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+h1 {
+    font-size: 2em; /* Larger title for the page */
+}
+
+/* Utility to center simple elements (used for the initial setup) */
+.center-text {
+    text-align: center;
+}
+
+/* Custom Colors for reference */
+:root {
+    --primary-green: #38b69e; /* The main accent color */
+    --light-green: #e9f5f1; /* Background for active/hover state */
+    --text-dark: #333;
+    --text-light: #5a5a5a;
+    --sidebar-width: 250px;
+}
+
+/* -------------------- SIDEBAR STYLING -------------------- */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff; /* White background */
+    position: fixed; /* Keep it in place when scrolling */
+    top: 0;
+    left: 0;
+    height: 100vh; /* Full height of the screen */
+    padding: 20px 0;
+    display: flex; /* Use flexbox to position the header, links, and sign-out */
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05); /* Subtle shadow on the edge */
+}
+
+.sidebar-header {
+    padding: 0 20px 20px 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.app-logo {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--primary-green);
+    /* In the screenshot, there is a small icon next to the text logo */
+    /* We'll add a simple placeholder for now */
+}
+
+/* Navigation Links List */
+.nav-links {
+    list-style: none; /* Remove bullet points */
+    flex-grow: 1; /* Pushes the sign-out to the bottom */
+}
+
+.nav-links li {
+    margin-bottom: 5px;
+}
+
+/* Individual Navigation Item (the anchor tag) */
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    text-decoration: none; /* Remove underline */
+    color: var(--text-light); /* Default text color for links */
+    font-weight: 600;
+    border-radius: 0 50px 50px 0; /* Creates the rounded look on the right */
+    transition: background-color 0.2s, color 0.2s;
+    margin-right: 10px; /* Space to see the rounded edge */
+}
+
+/* Icon next to the text */
+.nav-item .icon {
+    margin-right: 10px;
+    font-size: 1.2em;
+    line-height: 1; /* Helps align the icon vertically */
+}
+
+/* Hover State */
+.nav-item:hover {
+    background-color: var(--light-green);
+    color: var(--primary-green);
+}
+
+/* Active State (The currently selected page) */
+.nav-item.active {
+    background-color: var(--light-green);
+    color: var(--primary-green);
+    /* Adding a vertical bar on the left side of the active item for emphasis */
+    border-left: 4px solid var(--primary-green);
+    padding-left: 16px; /* Adjusting padding because of the new border */
+}
+
+/* Sign in Section Styling */
+.sign-in-section {
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    margin-top: auto; /* Ensures it sticks to the bottom */
+}
+
+.sign-in {
+    color: #2e7d32; /* Using a distinct color for sign-out/danger actions */
+    font-weight: 600;
+}
+
+.sign-in:hover {
+    background-color: #c9deca;
+    color: #000000;
+}
+
+/* -------------------- JOURNAL PAGE STYLING -------------------- */
+
+.page-header {
+    margin-bottom: 30px;
+}
+
+.subtitle {
+    color: var(--text-light);
+    font-size: 1.1em;
+}
+
+/* Styling for the card titles that have a green icon */
+.card-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.sparkle-icon {
+    color: var(--primary-green);
+    font-size: 1.4em;
+    margin-right: 10px;
+    line-height: 1; /* Aligns the icon nicely */
+}
+
+/* Text Area Styling */
+.entry-textarea {
+    width: 100%;
+    min-height: 250px; /* Make it large like in the screenshot */
+    padding: 20px;
+    font-size: 1em;
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical; /* Allow resizing only vertically */
+    transition: border-color 0.2s;
+    outline: none; /* Remove default focus outline */
+    color: #333;
+}
+
+.entry-textarea:focus {
+    border-color: var(--primary-green); /* Subtle feedback when focused */
+}
+
+/* Submit Button Styling (The large green button) */
+.submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Make it span the full width of the card */
+    padding: 15px 25px;
+    margin-top: 20px;
+    background-color: var(--primary-green);
+    color: #ffffff;
+    font-size: 1.1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.submit-button .icon {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.submit-button:hover {
+    background-color: #31a48c; /* Slightly darker green on hover */
+    box-shadow: 0 2px 8px rgba(56, 182, 158, 0.4); /* Green shadow */
+}
+
+/* Recent Entries Section */
+.recent-entries-section h2 {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* Additional utility for the Recent Entries card placeholder */
+.recent-entries-section .card {
+    border: 1px dashed #ccc; /* Dashed border for the placeholder look */
+    color: #777;
+}
+
+/* -------------------- AI CHAT PAGE STYLING -------------------- */
+
+.ai-chat-card {
+    /* Give the chat card a fixed height and enable scrolling if content overflows */
+    min-height: 600px;
+    display: flex; /* Use flex to manage the chat log and potential input area */
+    flex-direction: column;
+}
+
+.chat-log {
+    flex-grow: 1; /* Allows the chat log to take up most of the space */
+    padding-right: 10px; /* Space for the scrollbar if needed */
+    /* If you had a lot of messages, you'd use overflow-y: auto here */
+    /* For now, we'll focus on styling the bubbles */
+}
+
+/* Base style for all chat messages */
+.chat-message {
+    max-width: 80%; /* Messages shouldn't take up the full width */
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    line-height: 1.5;
+    word-wrap: break-word; /* Ensures long words wrap correctly */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Subtle shadow on bubbles */
+}
+
+/* User Message Styling (Green Bubble) */
+.user-message {
+    /* Aligned to the right */
+    margin-left: auto;
+    background-color: var(--primary-green); /* Green background */
+    color: #ffffff; /* White text */
+    /* Rounded corners: more rounded on top-left and bottom-left, less on the right */
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+/* AI Message Styling (Light/White Bubble) */
+.ai-message {
+    /* Aligned to the left (default) */
+    margin-right: auto;
+    background-color: #f7f7f7; /* Very light gray/off-white background */
+    color: var(--text-dark);
+    /* Rounded corners: more rounded on top-right and bottom-right, less on the left */
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+/* Specific styling for the AI intro line with the icon */
+.ai-intro {
+    font-weight: 600; /* Make the first sentence slightly bolder */
+    margin-bottom: 10px;
+}
+
+/* Ensure the sparkle icon in the AI chat is styled correctly */
+.ai-message .sparkle-icon {
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+
+/* Paragraph spacing inside the AI message */
+.ai-message p {
+    margin-bottom: 10px;
+}
+
+.ai-message p:last-child {
+    margin-bottom: 0;
+}
+
+/* -------------------- GOALS PAGE STYLING -------------------- */
+
+/* --- Goals Progress Card (The top green and white bar) --- */
+.goals-progress-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+}
+
+.progress-details {
+    display: flex;
+    align-items: center;
+}
+
+/* Styling the circular graphic area */
+.progress-circle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 30px;
+
+    /* Mimicking the circular border and green filling */
+    border: 5px solid var(--primary-green);
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    position: relative;
+    color: var(--primary-green);
+    font-weight: 600;
+}
+
+/* Hiding the simple text icon we used in the HTML for the graphic */
+.progress-icon {
+    display: none;
+}
+
+.progress-count {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.progress-label {
+    color: var(--text-light);
+    font-size: 0.9em;
+}
+
+/* Styling the 100% Progress Rate on the right */
+.progress-rate {
+    text-align: right;
+    color: var(--primary-green);
+}
+
+.rate-value {
+    font-size: 3em; /* Large 100% number */
+    font-weight: 700;
+}
+
+.rate-label {
+    font-size: 1em;
+    font-weight: 600;
+}
+
+/* --- Add New Goal Section --- */
+.add-goal-card {
+    margin-top: 25px;
+}
+
+.add-goal-input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.goal-input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    font-size: 1em;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.goal-input:focus {
+    border-color: var(--primary-green);
+}
+
+.add-goal-button {
+    background-color: var(--primary-green);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    width: 45px;
+    height: 45px;
+    font-size: 1.5em;
+    font-weight: 300;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-goal-button:hover {
+    background-color: #31a48c;
+}
+
+/* --- Your Goals List --- */
+
+.your-goals-list h2 {
+    margin-top: 40px;
+    margin-bottom: 15px;
+}
+
+.goal-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+}
+
+.goal-status-icon {
+    font-size: 1.5em;
+    margin-right: 15px;
+    color: #ccc;
+    cursor: pointer;
+}
+
+.goal-status-icon.done {
+    color: var(--primary-green); /* Green color for completed goals */
+    font-weight: 700;
+}
+
+.goal-text {
+    flex-grow: 1;
+    font-size: 1.1em;
+    color: var(--text-dark);
+}
+
+.delete-goal-button {
+    background: none;
+    border: none;
+    color: #f44336; /* Red color for delete icon */
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 5px;
+    transition: opacity 0.2s;
+}
+
+.delete-goal-button:hover {
+    opacity: 0.7;
+}
+
+/* -------------------- INSIGHTS PAGE STYLING -------------------- */
+
+/* --- Metric Cards (The top 4 boxes) --- */
+
+.metric-cards-container {
+    display: flex;
+    gap: 20px; /* Space between the cards */
+    margin-bottom: 30px;
+}
+
+.metric-card {
+    flex: 1; /* Makes all 4 cards take up equal width */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Aligns the icon to the top right */
+    padding: 20px 25px;
+}
+
+.metric-label {
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 2em;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.metric-icon {
+    font-size: 1.5em;
+    opacity: 0.7; /* Make the icons slightly subdued */
+}
+
+/* Specific color adjustments for some icons to match the screenshot */
+.metric-card:nth-child(2) .metric-icon { color: #8e44ad; } /* Purple for Goals Completed */
+.metric-card:nth-child(3) .metric-icon { color: #e74c3c; } /* Red/Fire for Current Streak */
+.metric-card:nth-child(4) .metric-icon { color: var(--primary-green); } /* Green for Progress Rate */
+
+/* --- Weekly Summary Section --- */
+
+.weekly-summary-section h2 {
+    margin-bottom: 15px;
+}
+
+.summary-label {
+    font-weight: 600;
+    font-size: 1.1em;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+/* Placeholder for the Bar Chart */
+.consistency-chart-placeholder {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end; /* Bars start from the bottom */
+    height: 120px;
+    padding-bottom: 10px; /* Space above the footer text */
+    border-bottom: 1px solid #eee; /* Light line under the bars */
+    margin-bottom: 15px;
+}
+
+.chart-bar {
+    flex: 1; /* Makes all bars equal width */
+    background-color: #f0f0f0; /* Light grey for empty bars */
+    height: 100%; /* Default height for bars (empty look) */
+    border-radius: 4px;
+    min-width: 30px; /* Ensures bars are visible */
+}
+
+/* Simulating the empty look from the screenshot */
+.chart-bar:nth-child(1) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(2) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(3) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(4) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(5) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(6) { height: 0%; background-color: #e9f5f1; }
+.chart-bar:nth-child(7) { height: 0%; background-color: #e9f5f1; }
+
+.chart-footer {
+    color: var(--text-light);
+    font-size: 0.9em;
+}
+
+/* -------------------- MIND SPACE PAGE STYLING -------------------- */
+
+.wellness-toolkit h2, .recommended-videos h2 {
+    margin-top: 20px;
+    margin-bottom: 5px;
+}
+
+.section-description {
+    color: var(--text-light);
+    font-size: 1em;
+    margin-bottom: 20px;
+}
+
+/* --- Toolkit Cards Container (Three Columns) --- */
+.toolkit-cards-container {
+    display: flex;
+    gap: 20px; /* Space between the cards */
+    margin-bottom: 40px;
+}
+
+.toolkit-card {
+    flex: 1; /* Makes all cards take up equal space */
+    text-align: center;
+    padding: 30px 20px;
+    display: flex; /* Use Flexbox to stack content vertically */
+    flex-direction: column;
+    align-items: center;
+}
+
+.toolkit-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: var(--primary-green); /* Use the app's accent color */
+}
+
+.toolkit-card h3 {
+    font-weight: 600;
+    font-size: 1.2em;
+    margin-bottom: 5px;
+    color: var(--text-dark);
+}
+
+.card-description {
+    color: var(--text-light);
+    font-size: 0.95em;
+    flex-grow: 1; /* Pushes the button to the bottom */
+    margin-bottom: 20px;
+}
+
+/* Styling the Action Buttons inside the cards */
+.toolkit-button {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: var(--light-green); /* Light green/grey background */
+    color: var(--primary-green); /* Green text */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.toolkit-button:hover {
+    background-color: #d1e8e2; /* Slightly darker light green on hover */
+    border-color: var(--primary-green);
+}
+
+/* -------------------- HOME/LOGIN PAGE STYLING -------------------- */
+
+/* Override base body style for login page */
+.login-body {
+    /* Center the container both horizontally and vertically */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Remove the sidebar offset */
+    margin-left: 0;
+    min-height: 100vh;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px; /* Limits the form width */
+    padding: 20px;
+    text-align: center;
+}
+
+.login-header {
+    margin-bottom: 30px;
+}
+
+.login-logo {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--primary-green);
+    margin-bottom: 5px;
+}
+
+.login-tagline {
+    font-size: 1em;
+    color: var(--text-light);
+}
+
+.login-card {
+    padding: 40px;
+    text-align: left; /* Aligns content inside the card */
+}
+
+.login-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+/* Input Group Styling */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block; /* Makes the label take up its own line */
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.login-form input:focus {
+    border-color: var(--primary-green);
+}
+
+/* Adjust the button for the login page */
+.login-button {
+    /* Reuse the styling from .submit-button in Step 3 */
+    margin-top: 15px;
+    margin-bottom: 25px;
+}
+
+.signup-link {
+    text-align: center;
+    font-size: 0.95em;
+    color: var(--text-light);
+}
+
+.signup-link a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* -------------------- GOOGLE LOGIN & DIVIDER STYLING -------------------- */
+
+/* Google Button Styling */
+.google-login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 25px;
+    margin-bottom: 25px;
+    background-color: #ffffff;
+    color: #4285f4; /* Google Blue */
+    font-size: 1.1em;
+    font-weight: 600;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.google-login-button:hover {
+    background-color: #f5f5f5;
+    border-color: #aaa;
+}
+
+.google-icon {
+    font-family: Arial, sans-serif; /* Fallback for a distinct 'G' */
+    font-weight: 700;
+    font-size: 1.2em;
+    margin-right: 10px;
+    color: #55db37; /* Google Red */
+}
+
+/* Divider Styling (The 'or' line) */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #eee;
+}
+
+.divider:not(:empty)::before {
+    margin-right: 0.5em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: 0.5em;
+}
+
+.divider-text {
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* -------------------- REGISTER PAGE SPECIFIC STYLING -------------------- */
+
+/* 1. Modifying input groups for the new style (no labels, just placeholders) */
+.login-form .input-group {
+    margin-bottom: 20px;
+}
+
+/* Remove label spacing since we are using placeholders for labels */
+.login-form .input-group label {
+    display: none;
+}
+
+/* 2. Style the main Signup button to look like the blue button in the image, but using our theme color */
+.primary-green-button {
+    /* Reusing the base submit button styles */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 15px 25px;
+    margin-top: 15px; /* Add some space above the button */
+    background-color: var(--primary-green); /* Use your theme green */
+    color: #ffffff;
+    font-size: 1.1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-green-button:hover {
+    background-color: #31a48c; /* Slightly darker green on hover */
+}
+
+/* 3. Adjust the "Already have an account? Login" link styling to match the image's placement */
+.signup-link {
+    text-align: center;
+    font-size: 1em; /* Slightly larger text */
+    margin-top: 15px; /* Space above */
+    margin-bottom: 25px; /* Space below before the divider */
+}
+
+.signup-link a {
+    font-weight: 700; /* Bold the link text */
+}
+
+
+/* 4. Adjust the social button spacing */
+.register-social-button {
+    /* Reuse the google-login-button styles but adjust margin */
+    margin-bottom: 15px; /* Less space than the default login button margin */
+}
+
+/* If you wanted a Facebook button (optional, but shows theme adaptation): */
+.facebook-login-button {
+    /* You don't have this in your current HTML, but here's how to style it */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 25px;
+    margin-bottom: 15px;
+    background-color: #4267b2; /* Standard Facebook blue */
+    color: #ffffff;
+    font-size: 1.1em;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+

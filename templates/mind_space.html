@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Journal - Mind Space</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="app-logo">Life Journal</div>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="{{ url_for('home') }}" class="nav-item {% if current_page == 'home' %}active{% endif %}">
+                    Journal
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ai_support') }}" class="nav-item {% if current_page == 'ai_support' %}active{% endif %}">
+                    AI Support
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('goals') }}" class="nav-item {% if current_page == 'goals' %}active{% endif %}">
+                    Goals
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('mind_space') }}" class="nav-item {% if current_page == 'mind_space' %}active{% endif %}">
+                    Mind Space
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('insights') }}" class="nav-item {% if current_page == 'insights' %}active{% endif %}">
+                    Insights
+                </a>
+            </li>
+        </ul>
+
+        <div class="sign-section">
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('logout') }}" class="nav-item sign-out">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-item sign-in">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main id="main-content" class="main-content">
+        <!-- Guided Session View (Hidden by default) -->
+        <div id="guided-session-container" class="card" style="display: none;">
+            <div class="guided-session-header">
+                <button class="back-button" onclick="handleBackButtonClick()">
+                    <span style="font-size: 1.5rem; margin-right: 5px;">&larr;</span> Back to Toolkit
+                </button>
+                <h2 id="session-title" class="ai-guide-title"></h2>
+            </div>
+
+            <div id="session-content"></div>
+        </div>
+
+        <!-- Main Toolkit View -->
+        <div id="toolkit-view">
+            <header class="page-header">
+                <h1>Mind Space</h1>
+                <p class="subtitle">Your personal wellness sanctuary 🧘</p>
+            </header>
+
+            <!-- Wellness Toolkit Section -->
+            <section class="card">
+                <h2 class="card-title">
+                    <span class="sparkle-icon">🧘</span>
+                    Your Wellness Toolkit
+                </h2>
+                <p class="section-description">Curated exercises and resources for your mental wellbeing</p>
+
+                <div class="toolkit-cards-container">
+                    <div class="toolkit-card card">
+                        <span class="toolkit-icon">💨</span>
+                        <h3>5-Minute Breathing Exercise</h3>
+                        <p class="card-description">Calm your mind with guided breathing and visual focus.</p>
+                        <button class="toolkit-button submit-button" data-exercise="Breathing">
+                            <span class="icon"></span>
+                            Start
+                        </button>
+                    </div>
+
+                    <div class="toolkit-card card">
+                        <span class="toolkit-icon">💚</span>
+                        <h3>Gratitude Practice</h3>
+                        <p class="card-description">Reflect on three things you're grateful for</p>
+                        <button class="toolkit-button submit-button" data-exercise="Gratitude">
+                            <span class="icon"></span>
+                            Begin
+                        </button>
+                    </div>
+
+                    <div class="toolkit-card card">
+                        <span class="toolkit-icon">🧘‍♀️</span>
+                        <h3>Mindfulness Meditation</h3>
+                        <p class="card-description">Ground yourself in the present moment</p>
+                        <button class="toolkit-button submit-button" data-exercise="Meditation">
+                            <span class="icon"></span>
+                            Meditate
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- CONFIRMATION MODAL STRUCTURE -->
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content card">
+            <h3 style="margin-top: 0; font-size: 1.5rem;">End Session?</h3>
+            <p style="color: #6b7280; margin: 1rem 0;">You are currently in a guided session. Are you sure you want to exit?</p>
+            <div class="modal-actions">
+                <button id="cancel-button" class="modal-button cancel">Stay in Session</button>
+                <button id="confirm-button" class="modal-button confirm">End & Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Mind Space specific styles */
+        .section-description {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .toolkit-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 1.5rem;
+        }
+
+        .toolkit-card {
+            text-align: center;
+        }
+
+        .toolkit-icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .toolkit-card h3 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .toolkit-button {
+            width: 100%;
+        }
+
+        /* Breathing Circle */
+        .breathing-container {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #14b8a6;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: transform 4s ease-in-out;
+        }
+
+        .breathing-circle.animate {
+            transform: scale(1.5);
+        }
+
+        /* Guided Session */
+        .guided-session-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #14b8a6;
+            padding-bottom: 20px;
+            background: linear-gradient(90deg, rgba(20, 184, 166, 0.05), transparent);
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin: -25px -25px 30px -25px;
+        }
+
+        .back-button {
+            background: white;
+            border: 2px solid #d1d5db;
+            color: #6b7280;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-right: 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .back-button:hover {
+            background-color: #14b8a6;
+            color: white;
+            border-color: #14b8a6;
+            transform: translateX(-5px);
+        }
+
+        .ai-guide-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #14b8a6, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ai-message {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 2.5rem;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.125rem;
+            line-height: 1.8;
+            color: #1f2937;
+            border-left: 5px solid #14b8a6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-message p {
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .ai-message p:hover {
+            transform: translateX(5px);
+        }
+
+        .ai-message p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-message strong {
+            color: #14b8a6;
+            font-weight: 700;
+            font-size: 1.15rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .modal-button.confirm {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #0d9488;
+        }
+
+        .modal-button.cancel {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toolkit-cards-container {
+                grid-template-columns: 1fr;
+            }
+            .guided-session-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .back-button {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+
+    <script>
+        const toolkitButtons = document.querySelectorAll('.toolkit-button');
+        const toolkitView = document.getElementById('toolkit-view');
+        const guidedSessionContainer = document.getElementById('guided-session-container');
+        const sessionTitle = document.getElementById('session-title');
+        const sessionContent = document.getElementById('session-content');
+
+        const modal = document.getElementById('confirmation-modal');
+        const confirmButton = document.getElementById('confirm-button');
+        const cancelButton = document.getElementById('cancel-button');
+
+        let isSessionActive = false;
+        let targetUrl = '';
+        let breathingIntervalId = null;
+        let inhaleInterval = null;
+        let exhaleInterval = null;
+
+        // Manual Content Definitions
+        const manualContents = {
+            'Gratitude': {
+                title: "Gratitude Practice",
+                html: `
+                    <div class="ai-message">
+                        <p>
+                            <strong>Step 1: Identify Three Positives.</strong>
+                            Take a moment to think of three specific things that happened today that you are genuinely grateful for.
+                        </p>
+                        <p>
+                            <strong>Step 2: Write Them Down.</strong>
+                            Capture each moment in a sentence or two. Focus on why each one matters to you.
+                        </p>
+                        <p>
+                            <strong>Step 3: Feel the Gratitude.</strong>
+                            Close your eyes and let yourself really feel the warmth and appreciation for these moments. Notice how it affects your mood.
+                        </p>
+                    </div>
+                `
+            },
+            'Meditation': {
+                title: "Mindfulness Body Scan",
+                html: `
+                    <div class="ai-message" style="border-left-color: #4f46e5;">
+                        <p>
+                            <strong style="color: #4f46e5">Settle In.</strong>
+                            Lie down or sit comfortably. Gently close your eyes. Take a few deep breaths, noticing how the air fills and leaves your lungs. Let your body relax into its support.
+                        </p>
+                        <p>
+                            <strong style="color: #4f46e5">Scan the Feet.</strong>
+                            Bring your attention to your feet. Wiggle your toes. Notice any sensations—tingling, warmth, or pressure. Breathe into your feet, allowing them to feel heavy and relaxed.
+                        </p>
+                        <p>
+                            <strong style="color: #4f46e5">Move to the Core.</strong>
+                            Slowly move your awareness up your legs to your abdomen and chest. Notice the gentle movement of your breath here. There is nothing to fix, only to notice.
+                        </p>
+                        <p>
+                            <strong style="color: #4f46e5">Relax the Shoulders and Arms.</strong>
+                            Move your attention to your hands, arms, and shoulders. Allow any tension in your shoulders to drop away. Feel your arms heavy and still.
+                        </p>
+                        <p>
+                            <strong style="color: #4f46e5">Release the Face.</strong>
+                            Finally, bring your awareness to your face, relaxing your jaw, eyes, and forehead. Rest here for a moment, present, alert, and at peace.
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        // Core Session Management Functions
+        function showGuidedSession(title) {
+            isSessionActive = true;
+            toolkitView.style.display = 'none';
+            guidedSessionContainer.style.display = 'block';
+            sessionTitle.textContent = title;
+            sessionContent.innerHTML = '';
+        }
+
+        function endAndHideSession() {
+            // Clear all intervals
+            if (breathingIntervalId) {
+                clearInterval(breathingIntervalId);
+                breathingIntervalId = null;
+            }
+            if (inhaleInterval) {
+                clearInterval(inhaleInterval);
+                inhaleInterval = null;
+            }
+            if (exhaleInterval) {
+                clearInterval(exhaleInterval);
+                exhaleInterval = null;
+            }
+            isSessionActive = false;
+            guidedSessionContainer.style.display = 'none';
+            toolkitView.style.display = 'block';
+            sessionContent.innerHTML = '';
+        }
+
+        function handleBackButtonClick() {
+            if (isSessionActive) {
+                targetUrl = '';
+                modal.classList.add('show');
+            } else {
+                endAndHideSession();
+            }
+        }
+
+        // Breathing Exercise Animation Logic
+        function startBreathingExercise() {
+            showGuidedSession("5-Minute Breathing Exercise");
+
+            sessionContent.innerHTML = `
+                <div class="breathing-container">
+                    <div id="breathing-circle" class="breathing-circle">Start</div>
+                    <div id="breathing-instruction" style="text-align: center; font-size: 1.25rem; font-weight: 600; color: #1f2937; margin: 20px 0; min-height: 30px;">
+                        Ready?
+                    </div>
+                    <button id="breathing-stop-btn" class="submit-button" style="background-color: #ef4444; display: block; margin: 20px auto;">
+                        <span class="icon"></span>
+                        Stop Session
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('breathing-stop-btn').onclick = endAndHideSession;
+
+            const circle = document.getElementById('breathing-circle');
+            const instruction = document.getElementById('breathing-instruction');
+            const cycleDuration = 8000; // 8 seconds total (4 inhale + 4 exhale)
+            const inhaleDuration = 4000; // 4 seconds
+
+            let totalCycles = 0;
+            const targetCycles = Math.floor((5 * 60 * 1000) / cycleDuration); // ~37 cycles for 5 minutes
+
+            function animateBreathingCycle() {
+                // Start inhale phase
+                circle.textContent = "Inhale";
+                circle.classList.add('animate');
+                let secondsLeft = 4;
+                instruction.textContent = `Inhale Deeply (${secondsLeft}s)`;
+
+                // Update countdown during inhale
+                inhaleInterval = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft > 0) {
+                        instruction.textContent = `Inhale Deeply (${secondsLeft}s)`;
+                    } else {
+                        clearInterval(inhaleInterval);
+                        inhaleInterval = null;
+                    }
+                }, 1000);
+
+                // After 4 seconds, start exhale
+                setTimeout(() => {
+                    circle.textContent = "Exhale";
+                    circle.classList.remove('animate');
+                    secondsLeft = 4;
+                    instruction.textContent = `Exhale Slowly (${secondsLeft}s)`;
+
+                    // Update countdown during exhale
+                    exhaleInterval = setInterval(() => {
+                        secondsLeft--;
+                        if (secondsLeft > 0) {
+                            instruction.textContent = `Exhale Slowly (${secondsLeft}s)`;
+                        } else {
+                            clearInterval(exhaleInterval);
+                            exhaleInterval = null;
+                        }
+                    }, 1000);
+
+                    // After exhale completes, check if we should continue
+                    setTimeout(() => {
+                        totalCycles++;
+
+                        if (totalCycles >= targetCycles) {
+                            // Session complete
+                            clearInterval(breathingIntervalId);
+                            breathingIntervalId = null;
+                            circle.classList.remove('animate');
+                            circle.textContent = "Done";
+                            instruction.textContent = "Session Complete. Excellent work!";
+                            const stopBtn = document.getElementById('breathing-stop-btn');
+                            stopBtn.innerHTML = '<span class="icon"></span>Return to Toolkit';
+                            stopBtn.style.backgroundColor = '#14b8a6';
+                        }
+                    }, inhaleDuration);
+                }, inhaleDuration);
+            }
+
+            // Start after 1 second delay
+            instruction.textContent = "Get Ready...";
+            setTimeout(() => {
+                animateBreathingCycle();
+                // Run the cycle every 8 seconds
+                breathingIntervalId = setInterval(animateBreathingCycle, cycleDuration);
+            }, 1000);
+        }
+
+        // Event Listeners
+        toolkitButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const exercise = button.getAttribute('data-exercise');
+
+                if (exercise === 'Breathing') {
+                    startBreathingExercise();
+                } else {
+                    const content = manualContents[exercise];
+                    showGuidedSession(content.title);
+                    sessionContent.innerHTML = content.html;
+                }
+            });
+        });
+
+        // Navigation Interception
+        document.querySelectorAll('.nav-links a, .sign-out').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const targetHref = link.getAttribute('href');
+
+                if (isSessionActive && !targetHref.includes('mind_space')) {
+                    e.preventDefault();
+                    targetUrl = targetHref;
+                    modal.classList.add('show');
+                }
+            });
+        });
+
+        // Modal Button Handlers
+        confirmButton.addEventListener('click', () => {
+            endAndHideSession();
+            modal.classList.remove('show');
+            if (targetUrl) {
+                window.location.href = targetUrl;
+            }
+            targetUrl = '';
+        });
+
+        cancelButton.addEventListener('click', () => {
+            modal.classList.remove('show');
+            targetUrl = '';
+        });
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('show');
+                targetUrl = '';
+            }
+        });
+    </script>
+</body>
+</html>

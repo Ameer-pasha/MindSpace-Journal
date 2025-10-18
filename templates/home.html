@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Journal - Daily Journal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        /* Style adjustments for the journal form/entries */
+        .journal-entry-card { margin-top: 20px; }
+        .card-title { font-size: 1.5rem; font-weight: 700; color: #1f2937; margin-bottom: 1.25rem; }
+        .entry-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 15px;
+            transition: border-color 0.2s;
+        }
+        .entry-textarea:focus { border-color: #14b8a6; outline: none; }
+        .submit-button {
+            display: inline-flex;
+            align-items: center;
+            background-color: #14b8a6;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .submit-button:hover { background-color: #0d9488; }
+
+        /* Entry Card & Button Styles */
+        .entry-card {
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+        .entry-content-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            width: 100%;
+        }
+        .entry-text-container { flex-grow: 1; }
+
+        .talk-ai-button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .talk-ai-button:hover { background-color: #4338ca; }
+
+        .entry-time, .entry-sentiment {
+            display: inline-block;
+            margin-top: 8px;
+            margin-right: 15px;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="app-logo">Life Journal</div>
+        </div>
+
+        <ul class="nav-links">
+            <li><a href="{{ url_for('home') }}" class="nav-item {% if current_page == 'home' %}active{% endif %}">Journal</a></li>
+            <li><a href="{{ url_for('ai_support') }}" class="nav-item {% if current_page == 'ai_support' %}active{% endif %}">AI Support</a></li>
+            <li><a href="{{ url_for('goals') }}" class="nav-item {% if current_page == 'goals' %}active{% endif %}">Goals</a></li>
+            <li><a href="{{ url_for('mind_space') }}" class="nav-item {% if current_page == 'mind_space' %}active{% endif %}">Mind Space</a></li>
+            <li><a href="{{ url_for('insights') }}" class="nav-item {% if current_page == 'insights' %}active{% endif %}">Insights</a></li>
+        </ul>
+
+        <div class="sign-section">
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('logout') }}" class="nav-item sign-out">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-item sign-in">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1>Daily Journal</h1>
+            <p class="subtitle">Reflect on your day and receive supportive insights</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Journal Entry Form -->
+        <section class="journal-entry-card card">
+            <h2 class="card-title">
+                <span class="sparkle-icon">✨</span>
+                Today's Entry
+            </h2>
+
+            <!-- Login check before save -->
+            <form class="journal-form" method="POST" action="{{ url_for('save_entry') }}" onsubmit="return checkLoginBeforeSave()">
+                <textarea
+                    name="entry"
+                    class="entry-textarea"
+                    placeholder="How are you feeling today? What's on your mind?"
+                    required
+                ></textarea>
+                <button type="submit" class="submit-button">
+                    <span class="icon"></span>
+                    Save
+                </button>
+            </form>
+        </section>
+
+        <!-- Recent Entries -->
+        <section class="recent-entries-section">
+            <h2>Recent Entries</h2>
+            {% if entries %}
+                {% for entry in entries %}
+                    <div class="card entry-card">
+                        <div class="entry-content-wrapper">
+                            <div class="entry-text-container">
+                                <p>{{ entry.text }}</p>
+                                <div style="display: flex; margin-top: 10px;">
+                                    {% if entry.sentiment is defined and entry.sentiment in sentiment_map %}
+                                        <span class="entry-sentiment">{{ sentiment_map[entry.sentiment] }}</span>
+                                    {% endif %}
+                                    {% if entry.time %}
+                                        <span class="entry-time">{{ entry.time }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <button
+                                onclick="handleAnalyzeClick(this)"
+                                class="talk-ai-button"
+                                data-entry-text="{{ entry.text }}"
+                            >
+                                Talk with AI
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card center-text" style="padding: 50px;">
+                    Your recent journal entries will appear here.
+                </div>
+            {% endif %}
+        </section>
+    </main>
+
+    <script>
+        // Check login before saving
+        function checkLoginBeforeSave() {
+            const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+            const entryText = document.querySelector('textarea[name="entry"]').value.trim();
+
+            if (!isLoggedIn) {
+                if (entryText.length === 0) {
+                    alert("Please write something first before saving.");
+                    return false;
+                }
+
+                // Save temporarily in localStorage
+                localStorage.setItem('pendingEntry', entryText);
+
+                alert("You need to log in to save your journal entry. Redirecting to login...");
+                window.location.href = "{{ url_for('login') }}";
+                return false;
+            }
+            return true;
+        }
+
+        // Auto-save pending entry after login
+        document.addEventListener('DOMContentLoaded', () => {
+            const pending = localStorage.getItem('pendingEntry');
+            if (pending && {{ 'true' if session.get('user_id') else 'false' }}) {
+                localStorage.removeItem('pendingEntry');
+
+                fetch("{{ url_for('save_entry') }}", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "entry=" + encodeURIComponent(pending)
+                }).then(() => {
+                    alert("Your journal entry has been saved automatically after login!");
+                    window.location.reload();
+                });
+            }
+        });
+
+        // Talk with AI button
+        function handleAnalyzeClick(buttonElement) {
+            const isLoggedIn = {{ 'true' if session.get('user_id') else 'false' }};
+            const entryText = buttonElement.getAttribute('data-entry-text');
+            const encodedText = encodeURIComponent(entryText);
+
+            if (!isLoggedIn) {
+                alert("Please log in to talk with the AI assistant.");
+                window.location.href = "{{ url_for('login') }}";
+                return;
+            }
+
+            window.location.href = "{{ url_for('ai_support') }}?analyze_text=" + encodedText;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Journal - Goals</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="app-logo">Life Journal</div>
+        </div>
+
+        <ul class="nav-links">
+            <li>
+                <a href="{{ url_for('home') }}" class="nav-item {% if current_page == 'home' %}active{% endif %}">
+                    Journal
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('ai_support') }}" class="nav-item {% if current_page == 'ai_support' %}active{% endif %}">
+                    AI Support
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('goals') }}" class="nav-item {% if current_page == 'goals' %}active{% endif %}">
+                    Goals
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('mind_space') }}" class="nav-item {% if current_page == 'mind_space' %}active{% endif %}">
+                    Mind Space
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('insights') }}" class="nav-item {% if current_page == 'insights' %}active{% endif %}">
+                    Insights
+                </a>
+            </li>
+        </ul>
+
+        <div class="sign-section">
+            {% if session.get('user_id') %}
+                <a href="{{ url_for('logout') }}" class="nav-item sign-out">Sign Out</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-item sign-in">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="page-header">
+            <h1>Goals & Tasks</h1>
+            <p class="subtitle">Track your progress, stay motivated, and celebrate your wins 🎯</p>
+        </header>
+
+        <!-- Progress Summary -->
+        <section class="card">
+            <h2 class="card-title">
+                <span class="sparkle-icon">📊</span>
+                Your Progress
+            </h2>
+            <div class="goals-progress-summary">
+                <div class="progress-circle-wrapper">
+                    <span class="progress-count">{{ completed_goals }} / {{ total_goals }}</span>
+                    <span class="progress-label">completed</span>
+                </div>
+                <div class="progress-rate">
+                    <div class="rate-value">{{ progress_percent }}%</div>
+                    <div class="rate-label">Overall Progress</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Add Goal Form -->
+        <section class="card">
+            <h2 class="card-title">
+                <span class="sparkle-icon">✨</span>
+                Add New Goal
+            </h2>
+            <form method="POST" action="{{ url_for('add_goal') }}" class="goal-form">
+                <div class="form-main-row">
+                    <input type="text" name="goal" class="entry-textarea" placeholder="Set a goal that matters to you..." required style="min-height: 50px; margin-bottom: 0;">
+                    <button type="submit" class="submit-button" style="width: 50px; height: 50px; font-size: 1.75rem; flex-shrink: 0;">
+                        <span class="icon">+</span>
+                    </button>
+                </div>
+                <div class="form-secondary-row">
+                    <input type="date" name="deadline" class="entry-textarea" style="min-height: 50px;">
+                    <input type="text" name="reason" class="entry-textarea" placeholder="Why do you want to achieve this?" style="min-height: 50px;">
+                </div>
+            </form>
+        </section>
+
+        <!-- Goals List -->
+        <section class="goals-list-section">
+            <h2>Your Goals</h2>
+            {% if goals_list %}
+                {% for goal in goals_list %}
+                <div class="card goal-item {% if goal.completed %}completed{% endif %}">
+                    <div class="goal-checkbox-wrapper">
+                        <form method="POST" action="{{ url_for('toggle_goal', goal_id=goal.id) }}" class="goal-toggle-form">
+                            <input type="checkbox" name="completed" id="goal-{{ goal.id }}" class="goal-checkbox"
+                                   {% if goal.completed %}checked{% endif %}
+                                   onchange="return handleGoalToggle(this, {{ goal.id }})">
+                        </form>
+                    </div>
+                    <div class="goal-content">
+                        <div class="goal-text">{{ goal.text }}</div>
+                        <div class="goal-meta">
+                            {% if goal.deadline %}
+                                <span class="goal-deadline">🎯 {{ goal.deadline }}</span>
+                            {% endif %}
+                            {% if goal.reason %}
+                                <span class="goal-reason">💡 {{ goal.reason }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="delete-form">
+                        <button type="submit" class="delete-goal-button" onclick="return confirm('Are you sure you want to delete this goal?')">🗑️</button>
+                    </form>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card center-text" style="padding: 50px;">
+                    No goals added yet. Start by adding one above!
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Achievements -->
+        {% if completed_goals_list %}
+        <section class="achievements-section">
+            <h2>Achievements 🎉</h2>
+            {% for goal in completed_goals_list %}
+                <div class="card achievement-item">
+                    <div class="goal-content">
+                        <div class="goal-text">{{ goal.text }}</div>
+                        <span class="entry-time">✔ Completed on {{ goal.completed_date }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+    </main>
+
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content card">
+            <h3 style="margin-top: 0; font-size: 1.5rem;">Confirm Goal Completion</h3>
+            <p style="color: #6b7280; margin: 1rem 0;">Are you sure you want to mark this goal as complete? That's awesome!</p>
+            <div class="modal-actions">
+                <button id="cancel-button" class="modal-button cancel">Not yet</button>
+                <button id="confirm-button" class="modal-button confirm">Yes, I completed it!</button>
+            </div>
+            <form id="modal-toggle-form" method="POST" action=""></form>
+        </div>
+    </div>
+
+    <style>
+        /* Goals-specific styles following the design pattern */
+        .goals-progress-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .progress-circle-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 120px;
+            height: 120px;
+            border: 4px dashed #14b8a6;
+            border-radius: 50%;
+        }
+
+        .progress-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #14b8a6;
+        }
+
+        .progress-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        .progress-rate {
+            text-align: right;
+        }
+
+        .progress-rate .rate-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #14b8a6;
+            line-height: 1;
+        }
+
+        .progress-rate .rate-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        /* Goal Form Styles */
+        .goal-form {
+            margin-top: 1.5rem;
+        }
+
+        .form-main-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .form-secondary-row {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Goal Item Styles */
+        .goal-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .goal-checkbox-wrapper {
+            flex-shrink: 0;
+            padding-top: 0.125rem;
+        }
+
+        .goal-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #14b8a6;
+        }
+
+        .goal-content {
+            flex: 1;
+        }
+
+        .goal-text {
+            font-size: 1rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .goal-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .goal-deadline, .goal-reason {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .goal-item.completed {
+            opacity: 0.6;
+        }
+
+        .goal-item.completed .goal-text {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        .delete-form {
+            flex-shrink: 0;
+        }
+
+        .delete-goal-button {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: all 0.2s;
+            padding: 0.25rem;
+        }
+
+        .delete-goal-button:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .achievement-item {
+            margin-bottom: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .modal-button.confirm {
+            background-color: #14b8a6;
+            color: white;
+        }
+
+        .modal-button.confirm:hover {
+            background-color: #0d9488;
+        }
+
+        .modal-button.cancel {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .modal-button.cancel:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .goals-progress-summary {
+                flex-direction: column;
+                text-align: center;
+            }
+            .progress-rate {
+                text-align: center;
+            }
+            .form-main-row, .form-secondary-row {
+                flex-direction: column;
+            }
+            .submit-button {
+                width: 100% !important;
+                height: 48px !important;
+            }
+            .goal-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+
+    <script>
+        // State variables to track the goal being toggled
+        let currentGoalId = null;
+        let currentCheckbox = null;
+
+        const modal = document.getElementById('confirmation-modal');
+        const toggleForm = document.getElementById('modal-toggle-form');
+        const confirmButton = document.getElementById('confirm-button');
+        const cancelButton = document.getElementById('cancel-button');
+
+        /**
+         * Intercepts the checkbox change event. Shows a modal for completion,
+         * or submits immediately for un-completion.
+         */
+        function handleGoalToggle(checkbox, goalId) {
+            if (checkbox.checked) {
+                // User is trying to mark goal as complete
+                currentGoalId = goalId;
+                currentCheckbox = checkbox;
+
+                // Show the confirmation modal
+                modal.classList.add('show');
+
+                // Prevent the immediate form submission
+                return false;
+
+            } else {
+                // User is trying to mark goal as incomplete
+                // No confirmation needed, submit the form immediately
+                checkbox.form.submit();
+                return true;
+            }
+        }
+
+        /**
+         * Submits the toggle request after user confirms via the modal.
+         */
+        function confirmToggle() {
+            if (currentGoalId !== null) {
+                // Set the action of the hidden form to the correct toggle URL
+                toggleForm.action = `{{ url_for('toggle_goal', goal_id=0) }}`.replace('/0', '/' + currentGoalId);
+
+                // Submit the hidden form
+                toggleForm.submit();
+            }
+        }
+
+        /**
+         * Hides the modal and reverts the checkbox state if the user cancels.
+         */
+        function cancelToggle() {
+            // Revert the checkbox state visually
+            if (currentCheckbox) {
+                currentCheckbox.checked = false;
+            }
+            // Reset state
+            currentGoalId = null;
+            currentCheckbox = null;
+            // Hide the modal
+            modal.classList.remove('show');
+        }
+
+        // Attach event listeners to modal buttons
+        confirmButton.addEventListener('click', confirmToggle);
+        cancelButton.addEventListener('click', cancelToggle);
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                cancelToggle();
+            }
+        });
+    </script>
+</body>
+</html>
