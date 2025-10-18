@@ -207,66 +207,78 @@ def get_gemini_response(chat_history: list) -> str:
 def login():
     form = LoginForm()
 
-    # If already logged in, redirect to home
     if session.get('user_id'):
         return redirect(url_for('home'))
 
-    # Google login URL setup (MUST be done before form validation check for initial load)
     google_login_url = None
-    # Check if 'flow' object (from OAuth setup) exists before accessing it
-    if 'flow' in globals() and flow:
+    client_secret_json = os.environ.get("GOOGLE_CLIENT_SECRET_JSON")
+    redirect_uri = os.environ.get("REDIRECT_URI")
+
+    if client_secret_json and redirect_uri:
+        flow = Flow.from_client_config(
+            json.loads(client_secret_json),
+            scopes=[
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "openid"
+            ],
+            redirect_uri=redirect_uri
+        )
         authorization_url, state = flow.authorization_url()
         session['state'] = state
         google_login_url = authorization_url
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-
         if user and user.password and check_password_hash(user.password, form.password.data):
-            # Log user in
             session['user_id'] = user.id
             session['user_email'] = user.email
-
-            # Flash success message
             flash("Logged in successfully!", "success")
-
-            # CRITICAL FIX: Redirect to the login page to display the flash message
-            # and trigger the JavaScript animation before the final redirect to 'home'.
-            return redirect(url_for('login'))
-
+            return redirect(url_for('home'))
         elif user:
             flash("Invalid password. Try again.", "danger")
         else:
             flash("Email not found. Please register first.", "warning")
             return redirect(url_for('register'))
 
-    # Pass the Google URL to the template on initial load or failure
     return render_template('login.html', form=form, google_login_url=google_login_url)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
 
-    # Google login URL setup (copied from /login to ensure the link works on this page too)
+    # Google login URL setup
     google_login_url = None
-    if 'flow' in globals() and flow:
+    client_secret_json = os.environ.get("GOOGLE_CLIENT_SECRET_JSON")
+    redirect_uri = os.environ.get("REDIRECT_URI")
+
+    if client_secret_json and redirect_uri:
+        # Create Flow object fresh per request
+        flow = Flow.from_client_config(
+            json.loads(client_secret_json),
+            scopes=[
+                "https://www.googleapis.com/auth/userinfo.email",
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "openid"
+            ],
+            redirect_uri=redirect_uri
+        )
         authorization_url, state = flow.authorization_url()
         session['state'] = state
         google_login_url = authorization_url
 
     if form.validate_on_submit():
-        # Check if email or username already exists
+        # Check if email already exists
         if User.query.filter_by(email=form.email.data).first():
             flash("Email already registered. Please login.", "danger")
             return redirect(url_for('login'))
 
+        # Check if username already exists
         if User.query.filter_by(username=form.username.data).first():
             flash("Username already taken. Choose another.", "danger")
-            # Keep form data on redirect if possible, or just redirect back
             return redirect(url_for('register'))
 
-            # Hash password and create user
+        # Hash password and create new user (OUTSIDE previous if-blocks!)
         hashed_password = generate_password_hash(form.password.data)
         new_user = User(
             username=form.username.data,
@@ -276,18 +288,14 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        # Automatically log in the user
+        # Log the user in automatically
         session['user_id'] = new_user.id
         session['user_email'] = new_user.email
         session['username'] = new_user.username
 
         flash("Account created! Logged in successfully.", "success")
+        return redirect(url_for('home'))
 
-        # CRITICAL FIX: Redirect to the register page to display the flash message
-        # and trigger the JavaScript animation before the final redirect to 'home'.
-        return redirect(url_for('register'))
-
-    # Pass the form and Google URL to the template on initial load or failure
     return render_template('register.html', form=form, google_login_url=google_login_url)
 
 
@@ -295,58 +303,79 @@ def register():
 
 @app.route('/callback')
 def callback():
-    if not flow:
+    client_secret_json = os.environ.get("GOOGLE_CLIENT_SECRET_JSON")
+    redirect_uri = os.environ.get("REDIRECT_URI")
+
+    if not client_secret_json or not redirect_uri:
         flash("Google OAuth is not configured.", "warning")
         return redirect(url_for('login'))
 
+    flow = Flow.from_client_config(
+        json.loads(client_secret_json),
+        scopes=[
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile",
+            "openid"
+        ],
+        redirect_uri=redirect_uri
+    )
+
+    # Check state
+    if request.args.get('state') != session.get('state'):
+        flash("State mismatch. Try logging in again.", "danger")
+        return redirect(url_for('login'))
+
     try:
-        # Step 1: Fetch the token using the authorization response
         flow.fetch_token(authorization_response=request.url)
     except Exception as e:
-        # Handle token fetch errors (e.g., state mismatch)
         flash(f"Google login failed: {str(e)}", "danger")
         return redirect(url_for('login'))
 
     credentials = flow.credentials
-
-    # Step 2: Verify the ID token and get user info
     request_session = google.auth.transport.requests.Request()
     id_info = google.oauth2.id_token.verify_oauth2_token(
-        credentials.id_token, request_session, GOOGLE_CLIENT_ID
+        credentials.id_token, request_session, os.environ.get("GOOGLE_CLIENT_ID")
     )
 
     email = id_info.get("email")
-    # Get the user's name from the Google profile, or use the email prefix as a fallback
-    name_from_google = id_info.get("name", email.split('@')[0])
+    if not email:
+        flash("Failed to get email from Google account.", "danger")
+        return redirect(url_for('login'))
 
-    # Step 3: Check if user exists
+    name_from_google = id_info.get("name", email.split('@')[0])
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        # --- CRITICAL FIX: Ensure Unique and Non-Null Username ---
         base_username = name_from_google.replace(" ", "").lower()
         username = base_username
         counter = 1
-
-        # Check for username conflict (REQUIRED if username is unique in DB)
         while User.query.filter_by(username=username).first():
             username = f"{base_username}{counter}"
             counter += 1
-
-        # Create new user with a unique username and NO password
-        new_user = User(email=email, password=None, username=username)
-        db.session.add(new_user)
+        user = User(email=email, username=username, password=None)
+        db.session.add(user)
         db.session.commit()
-        user = new_user
         flash(f"Welcome, {user.username}! Account created via Google.", "success")
 
-    # Step 4: Log the user in
     session['user_id'] = user.id
     session['user_email'] = user.email
-    session['username'] = user.username  # Ensure username is set in session
+    session['username'] = user.username
+    session.pop('state', None)
 
     flash(f"Logged in as {user.username} via Google!", "success")
     return redirect(url_for('home'))
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    if request.method == 'POST':
+        # User confirmed logout
+        session.clear()
+        flash("You have been logged out.", "info")
+        return redirect(url_for('home'))
+
+    # GET request: show confirmation page
+    return render_template('logout_confirm.html')
 
 
 @app.route('/logout', methods=['GET', 'POST'])
