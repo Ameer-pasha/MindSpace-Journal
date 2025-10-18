@@ -60,6 +60,12 @@
             display: flex;
         }
 
+        /* Optional: Add styles to hide the form during the transition */
+        .login-container.hide-form {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
     </style>
 </head>
 <body class="login-body">
@@ -74,11 +80,10 @@
         <div class="login-card card">
             <h2>{{ title if title else "Login" }}</h2>
 
-            <!-- FLASH MESSAGES: THIS IS WHERE THE 'success' CLASS MUST BE APPLIED -->
+            <!-- FLASH MESSAGES: This block renders the 'alert-success' message -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
-                        <!-- This line must render a class of 'alert-success' -->
                         <div class="alert alert-{{ category }} text-center">{{ message }}</div>
                     {% endfor %}
                 {% endif %}
@@ -139,21 +144,21 @@
             // Check for a server-flashed success message
             const successAlert = document.querySelector('.alert.alert-success');
             const successOverlay = document.getElementById('success-overlay');
+            const loginContainer = document.querySelector('.login-container');
 
             // If a success alert exists, trigger the animation and redirect
             if (successAlert) {
-                console.log("SUCCESS ALERT DETECTED. Triggering animation.");
+                // Hide the main form container instantly for a cleaner transition
+                loginContainer.classList.add('hide-form');
 
                 // Show the animation overlay
                 successOverlay.classList.add('show');
 
-                // Wait for animation to finish (approx 3 seconds total)
+                // Wait for animation to finish (3 seconds total, matching the JS timeout to the longest CSS animation)
                 setTimeout(() => {
-                    // Attempt to redirect to the home page (where logged-in users go)
+                    // Perform the final client-side redirect to the home page
                     window.location.href = "{{ url_for('home') }}";
                 }, 3000);
-            } else {
-                console.log("No success alert detected. Displaying standard login form.");
             }
         });
     </script>
