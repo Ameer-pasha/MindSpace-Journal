@@ -1,45 +1,39 @@
-# Standard library imports
-import json
-import os
 import pathlib
-import time
-import uuid
-from datetime import datetime, date, timedelta
-from functools import wraps
-
-# Third-party imports
-
-import requests
-import requests as http_requests
-from dotenv import load_dotenv
-
-# Google authentication imports
 import google.oauth2.id_token
 import google.auth.transport.requests
-from google_auth_oauthlib.flow import Flow
-
-# Flask imports
-from flask import Flask, render_template, request, flash, redirect, url_for, session, jsonify
-from flask_sqlalchemy import SQLAlchemy
+import joblib
+import time
+import os
+from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_wtf import FlaskForm
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-
-# Flask extensions and validators
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Email, Length
-
-# SQLAlchemy imports
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+from google_auth_oauthlib.flow import Flow
+import requests as http_requests
+import uuid
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, Length
 from sqlalchemy.orm import DeclarativeBase, relationship
-
-
-
+from datetime import datetime
+from datetime import datetime
+import uuid
+from dotenv import load_dotenv
+import os
+import requests
+import json
+import time
+import os
+from flask import render_template, request, jsonify, session, redirect, url_for
+from functools import wraps  # IMPORTED for the fix!
 
 load_dotenv()
 
-if os.environ.get('FLASK_ENV') == 'development':
-    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
 
 class Base(DeclarativeBase):
     pass
@@ -48,14 +42,13 @@ class Base(DeclarativeBase):
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
+# Load ML models
+classifier = joblib.load("models/tweet_sentiment_model.pkl")
+vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
+
 # Sentiment mapping
 sentiment_map = {0: "Neutral 🤔", 1: "Positive 😊", -1: "Negative 💛"}
-limiter = Limiter(
-    app=app,
-    key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"],
-    storage_uri="memory://"
-)
+
 # API configuration
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent"
@@ -79,7 +72,8 @@ if os.path.exists('client_secret.json'):
 else:
     flow = None
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mydatabase.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -406,7 +400,6 @@ def home():
 
 @app.route('/save-entry', methods=['POST'])
 @login_required
-@limiter.limit("50 per hour")
 def save_entry():
     user_id = session.get('user_id')
     entry_text = request.form.get('entry')
@@ -529,7 +522,6 @@ def delete_goal(goal_id):
 
 @app.route('/generate-insights-summary', methods=['POST'])
 @login_required
-@limiter.limit("20 per hour")
 def generate_insights_summary():
     """Generate AI-powered motivational summary for insights page"""
     try:
@@ -647,7 +639,7 @@ def insights():
 # In a real environment, these would be set up via environment variables.
 # We must use os.environ.get to access these values securely.
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_API_URL = os.environ.get('GEMINI_API_URL')
+GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent"
 GEMINI_MODEL_NAME = "gemini-2.5-flash-preview-09-2025"
 SYSTEM_PROMPT = "You are a helpful assistant."
 
@@ -754,7 +746,6 @@ def mind_space():
 
 @app.route("/ai-support", methods=["GET", "POST"])
 @login_required
-@limiter.limit("100 per hour")
 def ai_support():
     user_id = session.get('user_id')
     # Use request.args for GET parameters
@@ -888,4 +879,4 @@ def clear_chat():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=os.environ.get('FLASK_DEBUG', '0') == '1')
+    app.run(debug=True)
