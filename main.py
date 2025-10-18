@@ -1,8 +1,5 @@
-import pathlib
 import google.oauth2.id_token
 import google.auth.transport.requests
-import joblib
-import time
 import os
 from flask import Flask, render_template, request, flash, redirect, url_for, session
 from flask_wtf import FlaskForm
@@ -42,9 +39,6 @@ class Base(DeclarativeBase):
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-in-production")
 
-# Load ML models
-classifier = joblib.load("models/tweet_sentiment_model.pkl")
-vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
 
 # Sentiment mapping
 sentiment_map = {0: "Neutral 🤔", 1: "Positive 😊", -1: "Negative 💛"}
