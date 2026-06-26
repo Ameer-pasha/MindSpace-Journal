@@ -3,6 +3,7 @@
 A Flask-based personal journaling and wellness application with AI-powered emotional support, goal tracking, mindfulness exercises, and comprehensive insights.
 
 
+
 ## Features
 
 - **Daily Journaling**: Write and track daily journal entries with sentiment analysis
