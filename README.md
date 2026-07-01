@@ -16,6 +16,7 @@ A Flask-based personal journaling and wellness application with AI-powered emoti
 - **Insights Dashboard**: Visual analytics of your journaling habits and goal progress
 - **Google OAuth**: Sign in with Google or traditional email/password authentication
 
+
 ## Tech Stack
 
 - **Backend**: Flask (Python)
