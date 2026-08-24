@@ -4,7 +4,6 @@ A Flask-based personal journaling and wellness application with AI-powered emoti
 
 
 
-
 ## Features
 
 - **Daily Journaling**: Write and track daily journal entries with sentiment analysis
